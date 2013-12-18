@@ -26,7 +26,9 @@
     </style>
 </head>
 <body>
-    <textarea id="source" wrap="soft"  ></textarea>
+  
+    <textarea id="source" wrap="soft" onkeypress="return prockeypress(event);"  ></textarea>
+
     <script type="text/javascript">
 
         onload = function () {
@@ -36,9 +38,9 @@
            $content = $("#source"),
              printer = function () {
                  var ARGS = Array.prototype.splice.call(arguments, 0);
-                 setTimeout(function () {
-                     ARGS.forEach(function (val) { $content.text("{0}//debug:\t{1}\n".format($content.text(), (""+val).replace(/\s/g, " ") )) } )
-                 }, 1)
+                 setTimeout(
+                     ARGS.forEach(function (val) { $content.text("{0}//debug:\t{1}\n".format($content.text(), ("" + val).replace(/\s/g, " "))) })
+                 , 0);
              },
              rx2 = /\/\*[\S\s]*?\*\//,  /* match c-style comment */
              rx1 = /\/\/[\S\s]*?\n/,  /* match one liner comment */
@@ -65,40 +67,27 @@
                     );
             };
 
-            /*
-            on CTRL+ENTER evaluate and append the result to the source as a comment
-            */
-            $content.on("keyup", function (evt) {
+            window.prockeypress = function (evt) {
+
+                printer("Key Pressed charCode: {0}, CTRL key pressed: {1}".format(evt.charCode, evt.ctrlKey));
 
                 if (!evt.ctrlKey) return evt.cancelBubble = false;
 
-                switch ( evt.keyCode ) {
-                    case 13 :
+                switch (evt.keyCode) {
+                    case 13:
                         evalappend($content.text());
-                    break;
-                    case 32 :
-                        $content.text( picopressor( $content.text() )  );
-                    break;
-                    default: 
+                        break;
+                    case 32:
+                        $content.text(picopressor($content.text()));
+                        break;
+                    default:
                 }
-                return evt.cancelBubble = false ;
-         });
-
-
-            /*
-            var adjust_editor_size = function () {
-                $content.width($body.width() + "px");
-                $content.height($body.height() + "px");
+                   return evt.cancelBubble = false;
             }
-                    $(window).on("resize", function (evt) {
-                        adjust_editor_size();
-                        return false;
-                    })
-                    */
+
             // constructor
 
-            // adjust_editor_size();
-            var startup_info = "{0}\n\nbody.width() => {1} \t$content.width() => {2}\nbody.height() => {3} \t$content.height() => {4}"
+            var startup_info = "CTRL+ENTER = eval the cource, CTRL+SPACE = compress the space."
                 .format(navigator.userAgent, $body.width(), $content.width(), $body.height(), $content.height());
 
             printer ( new String(startup_info));
